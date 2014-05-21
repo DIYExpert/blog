@@ -43,18 +43,34 @@
 </span><span class="pun">{</span><span class="pln">
     </span><span class="kwd"><span class="hljs-keyword">void</span></span><span class="pln"> </span><span class="typ">Handle</span><span class="pun">(</span><span class="typ">TCommand</span><span class="pln"> command</span><span class="pun">);</span><span class="pln">
 </span><span class="pun">}</span></code></pre>
-                  <pre><span style="color: blue">public class </span><span style="color: #2b91af">HandlerRegistry </span>: <span style="color: #2b91af">Registry
-</span>{
-    <span style="color: blue">public </span>HandlerRegistry()
+                  <pre class="cscode"><code><span class="key">sealed</span> <span class="key">class</span> QueryProcessor : IQueryProcessor
+{
+                  <span class="key">private</span> <span class="key">readonly</span> Container container;
+                  <span class="key">public</span> QueryProcessor(Container container)
+    {
+                  <span class="key">this</span>.container = container;
+    }
+    [DebuggerStepThrough]
+                  <span class="key">public</span> TResult Process&lt;TResult&gt;(IQuery&lt;TResult&gt; query)
+    {
+                  <span class="key">var</span> handlerType =
+                  <span class="key">typeof</span>(IQueryHandler&lt;,&gt;).MakeGenericType(query.GetType(), <span class="key">typeof</span>(TResult));
+        dynamic handler = container.GetInstance(handlerType);
+                  <span class="key">return</span> handler.Handle((dynamic)query);
+    }
+}</code></pre>
+<pre class="cscode"><code><span class="key">public</span> <span class="key">class</span> HandlerRegistry : Registry
+{
+                  <span class="key">public</span> HandlerRegistry()
     {
         Scan(cfg =&gt;
         {
             cfg.TheCallingAssembly();
-            cfg.IncludeNamespaceContainingType&lt;<span style="color: #2b91af">MyCommandHandler</span>&gt;();
-            cfg.ConnectImplementationsToTypesClosing(<span style="color: blue">typeof</span>(<span style="color: #2b91af">ICommandHandler</span>&lt;&gt;));
+            cfg.IncludeNamespaceContainingType&lt;MyCommandHandler&gt;();
+            cfg.ConnectImplementationsToTypesClosing(<span class="key">typeof</span>(ICommandHandler&lt;&gt;));
         });
     }
-}</pre>
+}</code></pre>
                   </section>
           </div>
       </div>
