@@ -1,4 +1,4 @@
-# blog
+# Links
 
 Blog: https://diyexpert.github.io/blog/
 
